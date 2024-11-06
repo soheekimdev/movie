@@ -3,7 +3,7 @@ function MovieCard({ poster, title, voteAverage, onClick }) {
   const baseURL = 'https://image.tmdb.org/t/p/w500';
 
   return (
-    <div className="flex flex-col bg-white rounded overflow-hidden text-black cursor-pointer" onClick={onClick}>
+    <div className={`flex flex-col bg-white rounded overflow-hidden text-black cursor-pointer`} onClick={onClick}>
       <img src={baseURL + poster} alt={title} />
       <div className="p-2">
         <p className="font-bold">{title}</p>

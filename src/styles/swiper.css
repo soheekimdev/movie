@@ -1,0 +1,26 @@
+/* src/styles/swiper.css */
+
+/* 스와이퍼 네비게이션 버튼 */
+.swiper-button-next,
+.swiper-button-prev {
+  @apply w-[35px] h-[35px] bg-black/50 rounded-full !text-white;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  @apply text-base font-bold;
+}
+
+/* 페이지네이션 */
+.swiper-pagination-bullet {
+  @apply bg-white/50 opacity-100;
+}
+
+.swiper-pagination-bullet-active {
+  @apply bg-white;
+}
+
+/* 슬라이드 */
+.swiper-slide {
+  @apply h-auto; /* 높이 자동 조정 */
+}
