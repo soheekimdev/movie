@@ -25,7 +25,7 @@ function Main() {
           <Swiper
             modules={[Navigation, Pagination, Autoplay]}
             spaceBetween={20}
-            slidesPerView={3}
+            slidesPerView={1}
             navigation
             pagination={{ clickable: true }}
             autoplay={{
@@ -34,6 +34,20 @@ function Main() {
               pauseOnMouseEnter: true,
             }}
             loop={true}
+            breakpoints={{
+              640: {
+                slidesPerView: 1,
+                spaceBetween: 10,
+              },
+              768: {
+                slidesPerView: 3,
+                spaceBetween: 15,
+              },
+              1024: {
+                slidesPerView: 5,
+                spaceBetween: 20,
+              },
+            }}
           >
             {top20Movies.map((movie) => (
               <SwiperSlide key={movie.id} className="pb-12">
