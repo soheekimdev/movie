@@ -1,21 +1,43 @@
-import { useState } from 'react';
-import MovieCard from '../components/MovieCard';
-import data from '../data/movieListData.json';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import { getPopularMovies } from '../api/tmdb';
+import MovieCard from '../components/MovieCard';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import '../styles/swiper.css';
 
 function Main() {
-  const [movieList] = useState(data.results);
-  const [top20Movies] = useState(() => {
-    const sortedMovies = [...data.results].sort((a, b) => b.vote_average - a.vote_average);
-    return sortedMovies.slice(0, 20);
-  });
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const navigate = useNavigate();
+
+  const top10Movies = useMemo(() => {
+    return [...movies].sort((a, b) => b.vote_average - a.vote_average).slice(0, 10);
+  });
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        setLoading(true);
+        const response = await getPopularMovies();
+        setMovies(response.results);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovies();
+  }, []);
+
+  if (loading) return <div>로딩 중...</div>;
+  if (error) return <div>에러가 발생했습니다: {error}</div>;
 
   return (
     <>
@@ -35,8 +57,12 @@ function Main() {
             }}
             loop={true}
             breakpoints={{
-              640: {
+              360: {
                 slidesPerView: 1,
+                spaceBetween: 10,
+              },
+              640: {
+                slidesPerView: 2,
                 spaceBetween: 10,
               },
               768: {
@@ -49,13 +75,13 @@ function Main() {
               },
             }}
           >
-            {top20Movies.map((movie) => (
+            {top10Movies.map((movie) => (
               <SwiperSlide key={movie.id} className="pb-12">
                 <MovieCard
                   poster={movie.poster_path}
                   title={movie.title}
                   voteAverage={movie.vote_average}
-                  onClick={() => navigate('/details')}
+                  onClick={() => navigate(`/details/${movie.id}`)}
                 />
               </SwiperSlide>
             ))}
@@ -66,13 +92,13 @@ function Main() {
       <section className="flex flex-col gap-4 p-8">
         <h2 className="text-2xl">현재 상영중</h2>
         <div className="grid grid-cols-3 gap-5">
-          {movieList.map((movie) => (
+          {movies.map((movie) => (
             <MovieCard
               key={movie.id}
               poster={movie.poster_path}
               title={movie.title}
               voteAverage={movie.vote_average}
-              onClick={() => navigate('/details')}
+              onClick={() => navigate(`/details/${movie.id}`)}
             />
           ))}
         </div>
