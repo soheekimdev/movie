@@ -8,9 +8,9 @@ import Signup from './pages/Signup';
 
 function App() {
   return (
-    <>
+    <div className="min-h-svh flex flex-col">
       <NavBar />
-      <main className="flex flex-col h-full">
+      <main className="flex-1 flex flex-col">
         <Routes>
           <Route path="/" element={<Main />} />
           <Route path="/details/:id" element={<MovieDetail />} />
@@ -18,7 +18,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
         </Routes>
       </main>
-    </>
+    </div>
   );
 }
 
