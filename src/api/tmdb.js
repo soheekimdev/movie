@@ -14,9 +14,9 @@ const options = {
   },
 };
 
-export const getPopularMovies = async () => {
+export const getPopularMovies = async (page) => {
   try {
-    const response = await fetch(`${BASE_URL + ENDPOINT.MOVIE.POPULAR}?language=ko-KR`, options);
+    const response = await fetch(`${BASE_URL + ENDPOINT.MOVIE.POPULAR}?language=ko-KR&page=${page}`, options);
 
     if (!response.ok) {
       throw new Error('API 요청에 실패했습니다.');
