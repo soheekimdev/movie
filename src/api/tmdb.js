@@ -4,11 +4,19 @@ const ENDPOINT = {
     POPULAR: '/movie/popular',
   },
 };
-const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const ACCESS_TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN;
+
+const options = {
+  method: 'GET',
+  headers: {
+    Authorization: `Bearer ${ACCESS_TOKEN}`,
+    Accept: 'application/json',
+  },
+};
 
 export const getPopularMovies = async () => {
   try {
-    const response = await fetch(`${BASE_URL + ENDPOINT.MOVIE.POPULAR}?api_key=${API_KEY}&language=ko-KR`);
+    const response = await fetch(`${BASE_URL + ENDPOINT.MOVIE.POPULAR}?language=ko-KR`, options);
 
     if (!response.ok) {
       throw new Error('API 요청에 실패했습니다.');
@@ -24,7 +32,7 @@ export const getPopularMovies = async () => {
 
 export const getMovieDetails = async (movieId) => {
   try {
-    const response = await fetch(`${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=ko-KR`);
+    const response = await fetch(`${BASE_URL}/movie/${movieId}?language=ko-KR`, options);
 
     if (!response) {
       throw new Error('API 요청에 실패했습니다.');

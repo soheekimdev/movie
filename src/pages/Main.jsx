@@ -13,12 +13,11 @@ function Main() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const navigate = useNavigate();
 
   const top10Movies = useMemo(() => {
     return [...movies].sort((a, b) => b.vote_average - a.vote_average).slice(0, 10);
-  });
+  }, [movies]);
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -90,7 +89,7 @@ function Main() {
       </section>
 
       <section className="flex flex-col gap-4 p-8">
-        <h2 className="text-2xl">현재 상영중</h2>
+        <h2 className="text-2xl">인기 영화</h2>
         <div className="grid grid-cols-3 gap-5">
           {movies.map((movie) => (
             <MovieCard
