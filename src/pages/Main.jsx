@@ -90,7 +90,7 @@ function Main() {
 
   return (
     <>
-      <section className="flex flex-col gap-4 p-8">
+      <section className="flex flex-col gap-4 px-4 md:px-8">
         <h2 className="text-2xl">TOP 10</h2>
         <div className="relative">
           <Swiper
@@ -108,47 +108,33 @@ function Main() {
             breakpoints={{
               360: {
                 slidesPerView: 1,
-                spaceBetween: 10,
               },
               640: {
                 slidesPerView: 2,
-                spaceBetween: 10,
               },
               768: {
                 slidesPerView: 3,
-                spaceBetween: 15,
               },
               1024: {
-                slidesPerView: 5,
-                spaceBetween: 20,
+                slidesPerView: 4,
               },
             }}
           >
             {top10Movies.map((movie) => (
               <SwiperSlide key={movie.id} className="pb-12">
-                <MovieCard
-                  poster={movie.poster_path}
-                  title={movie.title}
-                  voteAverage={movie.vote_average}
-                  onClick={() => navigate(`/details/${movie.id}`)}
-                />
+                <MovieCard movie={movie} onClick={() => navigate(`/details/${movie.id}`)} />
               </SwiperSlide>
             ))}
           </Swiper>
         </div>
       </section>
 
-      <section className="flex flex-col gap-4 p-8">
+      <section className="flex flex-col gap-4 px-4 md:px-8">
         <h2 className="text-2xl">인기 영화</h2>
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
           {movies.map((movie, index) => (
             <div key={movie.id} ref={index === movies.length - 1 ? lastMovieRef : null}>
-              <MovieCard
-                poster={movie.poster_path}
-                title={movie.title}
-                voteAverage={movie.vote_average}
-                onClick={() => navigate(`/details/${movie.id}`)}
-              />
+              <MovieCard movie={movie} onClick={() => navigate(`/details/${movie.id}`)} />
             </div>
           ))}
           {isfetching && <div>...</div>}

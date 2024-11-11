@@ -29,7 +29,7 @@ function MovieDetail() {
   if (error) return <div>에러가 발생했습니다: {error}</div>;
 
   return (
-    <div className="flex gap-6 flex-wrap p-8">
+    <div className="flex flex-col md:flex-row gap-6 flex-wrap p-8">
       <section className="w-[50%]">
         <img src={baseURL + movie.poster_path} alt={movie.title} className="object-contain" />
       </section>
