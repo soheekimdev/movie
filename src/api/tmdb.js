@@ -3,6 +3,9 @@ const ENDPOINT = {
   MOVIE: {
     POPULAR: '/movie/popular',
   },
+  SEARCH: {
+    MOVIE: '/search/movie',
+  },
 };
 const ACCESS_TOKEN = import.meta.env.VITE_TMDB_ACCESS_TOKEN;
 
@@ -43,5 +46,19 @@ export const getMovieDetails = async (movieId) => {
   } catch (error) {
     console.error('영화 상세 정보를 가져오는 데 실패했습니다.', error);
     throw error;
+  }
+};
+
+export const searchMovies = async (query) => {
+  try {
+    const response = await fetch(
+      `${BASE_URL + ENDPOINT.SEARCH.MOVIE}?query=${encodeURIComponent(query)}&language=ko-KR`,
+      options
+    );
+    const data = await response.json();
+    return data.results;
+  } catch (error) {
+    console.error('영화 검색 중 에러 발생:', error);
+    return [];
   }
 };
