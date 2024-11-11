@@ -2,10 +2,7 @@ function MovieCard({ movie, onClick }) {
   const baseURL = 'https://image.tmdb.org/t/p/w500';
 
   return (
-    <div
-      className={`flex flex-col w-full h-full bg-white rounded overflow-hidden text-black cursor-pointer`}
-      onClick={onClick}
-    >
+    <div className={`flex flex-col w-full h-full rounded overflow-hidden text-black cursor-pointer`} onClick={onClick}>
       <div className="relative w-full aspect-[2/3]">
         {movie.poster_path ? (
           <img
@@ -20,8 +17,8 @@ function MovieCard({ movie, onClick }) {
         )}
       </div>
 
-      <div className="flex flex-col flex-1 p-4">
-        <h3 className="font-bold text-lg mb-2 line-clamp-2">{movie.title}</h3>
+      <div className="flex flex-col flex-1 p-2 bg-white">
+        <h3 className="font-bold text-lg mb-2 line-clamp-2 leading-6">{movie.title}</h3>
         <div className="mt-auto flex items-center justify-between">
           <span className="text-sm text-gray-500">{movie.release_date?.slice(0, 4)}</span>
           <span className="text-sm font-medium">⭐ {movie.vote_average?.toFixed(1)}</span>
