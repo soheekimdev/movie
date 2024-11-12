@@ -32,7 +32,7 @@ export default function Signup() {
   const [isValid, setIsValid] = useState(false);
 
   const validateForm = () => {
-    let tempErrors = {
+    const tempErrors = {
       name: '',
       email: '',
       password: '',
@@ -52,11 +52,29 @@ export default function Signup() {
       }
     }
 
+    // 비밀번호 검사 - Supabase 정책 반영
     if (touched.password) {
       if (!formData.password) {
         tempErrors.password = '비밀번호를 입력해주세요';
-      } else if (formData.password.length < 6) {
-        tempErrors.password = '비밀번호는 최소 6자 이상이어야 합니다';
+      } else {
+        const hasNumber = /\d/.test(formData.password);
+        const hasLowerCase = /[a-z]/.test(formData.password);
+        const hasUpperCase = /[A-Z]/.test(formData.password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(formData.password);
+
+        if (formData.password.length < 6) {
+          tempErrors.password = '비밀번호는 최소 6자 이상이어야 합니다';
+        } else if (!hasNumber || (!hasLowerCase && !hasUpperCase)) {
+          tempErrors.password = '비밀번호는 숫자와 문자를 모두 포함해야 합니다';
+        } else if (formData.password.length < 8 && !hasSpecialChar) {
+          tempErrors.password = '8자 미만인 경우 특수문자를 포함해야 합니다';
+        }
+
+        // 흔한 비밀번호 체크
+        const commonPasswords = ['password', '123456', '123456789', 'qwerty', '12345'];
+        if (commonPasswords.includes(formData.password.toLowerCase())) {
+          tempErrors.password = '너무 흔한 비밀번호입니다';
+        }
       }
     }
 
@@ -130,16 +148,26 @@ export default function Signup() {
         alert('회원가입이 완료되었습니다!\n이메일 인증 후 로그인해주세요.');
         navigate('/login');
       } catch (error) {
+        console.error('회원가입 에러 상세:', {
+          message: error.message,
+          status: error.status,
+          error,
+        });
+
         let errorMessage = '회원가입 중 오류가 발생했습니다.';
 
         if (error.message.includes('email')) {
           errorMessage = '이미 사용 중인 이메일입니다.';
-        } else if (error.message.includes('password')) {
-          errorMessage = '비밀번호가 너무 취약합니다.';
+        } else if (error.message?.includes('password')) {
+          errorMessage =
+            '비밀번호가 정책에 맞지 않습니다. 다음 조건을 확인해주세요:\n' +
+            '- 최소 6자 이상\n' +
+            '- 숫자와 문자 포함\n' +
+            '- 8자 미만인 경우 특수문자 포함\n' +
+            '- 흔히 사용되는 비밀번호는 사용 불가';
         }
 
         alert(errorMessage);
-        console.error('회원가입 에러:', error);
       } finally {
         setIsLoading(false);
       }
