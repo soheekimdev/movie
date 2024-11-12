@@ -156,15 +156,19 @@ export default function Signup() {
 
         let errorMessage = '회원가입 중 오류가 발생했습니다.';
 
-        if (error.message.includes('email')) {
+        if (error.message?.includes('already registered')) {
           errorMessage = '이미 사용 중인 이메일입니다.';
-        } else if (error.message?.includes('password')) {
-          errorMessage =
-            '비밀번호가 정책에 맞지 않습니다. 다음 조건을 확인해주세요:\n' +
-            '- 최소 6자 이상\n' +
-            '- 숫자와 문자 포함\n' +
-            '- 8자 미만인 경우 특수문자 포함\n' +
-            '- 흔히 사용되는 비밀번호는 사용 불가';
+        } else if (error.code === 'weak_password') {
+          if (error.reasons?.includes('length')) {
+            errorMessage = '비밀번호는 최소 6자 이상이어야 합니다.';
+          } else {
+            errorMessage =
+              '비밀번호가 정책에 맞지 않습니다. 다음 조건을 확인해주세요:\n' +
+              '- 최소 6자 이상\n' +
+              '- 숫자와 문자 포함\n' +
+              '- 8자 미만인 경우 특수문자 포함\n' +
+              '- 흔히 사용되는 비밀번호는 사용 불가';
+          }
         }
 
         alert(errorMessage);
