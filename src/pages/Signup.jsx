@@ -1,8 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '../api/supabase';
 import InputWithLabel from '../components/InputWithLabel';
 import Button from '../components/Button';
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -96,7 +101,7 @@ export default function Signup() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     setTouched({
@@ -107,8 +112,37 @@ export default function Signup() {
     });
 
     if (validateForm()) {
-      // 추후 회원가입 로직 구현
-      console.log('폼 유효성 검사 통과:', formData);
+      setIsLoading(true);
+
+      try {
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: {
+              name: formData.name,
+            },
+          },
+        });
+
+        if (authError) throw authError;
+
+        alert('회원가입이 완료되었습니다!\n이메일 인증 후 로그인해주세요.');
+        navigate('/login');
+      } catch (error) {
+        let errorMessage = '회원가입 중 오류가 발생했습니다.';
+
+        if (error.message.includes('email')) {
+          errorMessage = '이미 사용 중인 이메일입니다.';
+        } else if (error.message.includes('password')) {
+          errorMessage = '비밀번호가 너무 취약합니다.';
+        }
+
+        alert(errorMessage);
+        console.error('회원가입 에러:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -161,7 +195,7 @@ export default function Signup() {
           disabled={!isValid}
           className={!isValid ? 'opacity-50 cursor-not-allowed' : ''}
         >
-          회원가입
+          {isLoading ? '처리중...' : '회원가입'}
         </Button>
       </form>
     </div>

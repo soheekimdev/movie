@@ -1,16 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { signOut } from '../store/authSlice';
 import { searchMovies } from '../api/tmdb';
 import useDebounce from '../hooks/useDebounce';
 import Logo from '../assets/logo.png';
-import { Menu } from 'lucide-react';
+import { Menu, User, LogOut } from 'lucide-react';
 
 export default function NavBar() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const userMenuRef = useRef(null);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 400);
 
@@ -33,6 +41,9 @@ export default function NavBar() {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setIsMenuOpen(false);
       }
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setIsUserMenuOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -41,6 +52,69 @@ export default function NavBar() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  const handleSignOut = async () => {
+    try {
+      await dispatch(signOut()).unwrap();
+      navigate('/');
+    } catch (error) {
+      console.error('로그아웃 실패:', error);
+      alert('로그아웃 중 오류가 발생했습니다.');
+    }
+  };
+
+  const UserMenu = () => (
+    <div className="relative" ref={userMenuRef}>
+      <button
+        onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+        className="flex items-center gap-2 text-white hover:text-gray-300 transition-colors"
+      >
+        <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+          <span className="text-sm font-medium text-white">
+            {user.user_metadata?.name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
+          </span>
+        </div>
+      </button>
+
+      {isUserMenuOpen && (
+        <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="px-4 py-3 text-sm text-gray-900 border-b">
+            <p className="font-medium truncate">{user.user_metadata?.name || '사용자'}</p>
+            <p className="text-gray-500 truncate text-xs">{user.email}</p>
+          </div>
+          <Link
+            to="/mypage"
+            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            onClick={() => setIsUserMenuOpen(false)}
+          >
+            <User className="w-4 h-4" />
+            마이 페이지
+          </Link>
+          <button
+            onClick={() => {
+              handleSignOut();
+              setIsUserMenuOpen(false);
+            }}
+            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            <LogOut className="w-4 h-4" />
+            로그아웃
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
+  const AuthButtons = () => (
+    <>
+      <Link to="/login" className="text-white hover:text-gray-300 transition-colors text-sm md:text-base">
+        로그인
+      </Link>
+      <Link to="/signup" className="text-white hover:text-gray-300 transition-colors text-sm md:text-base">
+        회원가입
+      </Link>
+    </>
+  );
 
   return (
     <header className="flex gap-6 items-center justify-between h-16 px-4 md:px-8 sticky top-0 left-0 right-0 z-50 bg-black">
@@ -101,14 +175,7 @@ export default function NavBar() {
         </div>
 
         {/* 데스크톱 메뉴 */}
-        <div className="hidden sm:flex items-center gap-4">
-          <Link to="/login" className="text-white hover:text-gray-300 transition-colors text-sm md:text-base">
-            로그인
-          </Link>
-          <Link to="/signup" className="text-white hover:text-gray-300 transition-colors text-sm md:text-base">
-            회원가입
-          </Link>
-        </div>
+        <div className="hidden sm:flex items-center gap-4">{user ? <UserMenu /> : <AuthButtons />}</div>
 
         {/* 모바일 메뉴 버튼 */}
         <div className="relative sm:hidden" ref={menuRef}>
@@ -122,20 +189,47 @@ export default function NavBar() {
           {/* 모바일 메뉴 드롭다운 */}
           {isMenuOpen && (
             <div className="absolute top-full right-0 mt-2 w-36 bg-white rounded-lg shadow-lg overflow-hidden">
-              <Link
-                to="/login"
-                className="block w-full px-4 py-3 text-gray-800 hover:bg-gray-100 transition-colors text-sm"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                로그인
-              </Link>
-              <Link
-                to="/signup"
-                className="block w-full px-4 py-3 text-gray-800 hover:bg-gray-100 transition-colors text-sm"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                회원가입
-              </Link>
+              {user ? (
+                <>
+                  <div className="px-4 py-2 text-sm text-gray-900 border-b">
+                    <p className="font-medium truncate">{user.user_metadata?.name || '사용자'}</p>
+                    <p className="text-gray-500 truncate text-xs">{user.email}</p>
+                  </div>
+                  <Link
+                    to="/mypage"
+                    className="block w-full px-4 py-2 text-gray-800 hover:bg-gray-100 transition-colors text-sm"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    마이 페이지
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleSignOut();
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full px-4 py-2 text-left text-gray-800 hover:bg-gray-100 transition-colors text-sm"
+                  >
+                    로그아웃
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="block w-full px-4 py-3 text-gray-800 hover:bg-gray-100 transition-colors text-sm"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    로그인
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="block w-full px-4 py-3 text-gray-800 hover:bg-gray-100 transition-colors text-sm"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    회원가입
+                  </Link>
+                </>
+              )}
             </div>
           )}
         </div>
