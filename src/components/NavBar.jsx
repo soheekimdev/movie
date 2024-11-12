@@ -59,7 +59,7 @@ export default function NavBar() {
             <span className="text-gray-500">{isSearching ? <div className="animate-spin">⌛</div> : '🔎'}</span>
             <input
               type="search"
-              className="w-full text-gray-900 outline-none bg-transparent placeholder-gray-500 text-sm md:text-base"
+              className="w-full outline-none bg-transparent placeholder-gray-500 text-sm md:text-base"
               placeholder={isSearching ? '검색 중...' : '영화 제목으로 검색'}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
