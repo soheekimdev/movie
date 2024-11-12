@@ -9,6 +9,7 @@ import MovieDetail from './pages/MovieDetail';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import MyPage from './pages/MyPage';
+import AuthCallback from './pages/AuthCallback';
 
 function App() {
   const dispatch = useDispatch();
@@ -25,6 +26,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/mypage" element={<MyPage />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
       </Route>
     </Routes>
   );

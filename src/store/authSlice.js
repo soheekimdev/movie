@@ -8,6 +8,7 @@ const initialState = {
 };
 
 // 비동기 액션 생성
+// 인증 상태 초기화
 export const initializeAuth = createAsyncThunk('auth/initialize', async () => {
   const {
     data: { session },
@@ -15,6 +16,7 @@ export const initializeAuth = createAsyncThunk('auth/initialize', async () => {
   return session?.user ?? null;
 });
 
+// 로그인
 export const signIn = createAsyncThunk('auth/signIn', async ({ email, password }, { rejectWithValue }) => {
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -34,6 +36,7 @@ export const signIn = createAsyncThunk('auth/signIn', async ({ email, password }
   }
 });
 
+// 로그아웃
 export const signOut = createAsyncThunk('auth/signOut', async (_, { rejectWithValue }) => {
   try {
     await supabase.auth.signOut();
@@ -43,6 +46,24 @@ export const signOut = createAsyncThunk('auth/signOut', async (_, { rejectWithVa
   }
 });
 
+// 구글 롤그인
+export const signInWithGoogle = createAsyncThunk('auth/signInWithGoogle', async (_, { rejectWithValue }) => {
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    return rejectWithValue(error.message);
+  }
+});
+
+// 리듀서 설정
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -81,6 +102,18 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(signOut.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      // 구글 로그인
+      .addCase(signInWithGoogle.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(signInWithGoogle.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(signInWithGoogle.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload;
       });
   },

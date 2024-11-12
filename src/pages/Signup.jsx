@@ -147,9 +147,9 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex-1 flex flex-col gap-8 items-center justify-center h-full p-4 md:p-8">
+    <div className="flex-1 self-center flex flex-col gap-8 items-center justify-center min-w-[400px] h-full p-4 md:p-8">
       <h2 className="font-bold text-3xl">회원가입</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-10 w-full max-w-[400px]">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-10 w-full">
         <fieldset className="flex flex-col gap-4">
           <InputWithLabel
             label="이름"
